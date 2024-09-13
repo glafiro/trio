@@ -9,11 +9,33 @@
 #pragma once
 
 #include <JuceHeader.h>
+using namespace juce;
 
-//==============================================================================
-/**
-*/
-class MultibandCompressorAudioProcessor  : public juce::AudioProcessor
+#include <vector>
+using std::vector;
+
+#include "DSPParameters.h"
+#include "Multiband.h"
+#include "Utils.h"
+
+
+#define PLUGIN_VERSION 1
+
+#define PARAMETER_ID(str) const juce::ParameterID str(#str, PLUGIN_VERSION);
+
+PARAMETER_ID(threshold)
+PARAMETER_ID(ratio)
+PARAMETER_ID(attack)
+PARAMETER_ID(release)
+
+#define THRESHOLD   0.0f
+#define RATIO       3.0f
+#define ATTACK      50.0f
+#define RELEASE     250.0f
+
+class MultibandCompressorAudioProcessor  : 
+    public AudioProcessor,
+    private ValueTree::Listener
 {
 public:
     //==============================================================================
@@ -28,14 +50,14 @@ public:
     bool isBusesLayoutSupported (const BusesLayout& layouts) const override;
    #endif
 
-    void processBlock (juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
+    void processBlock (AudioBuffer<float>&, MidiBuffer&) override;
 
     //==============================================================================
-    juce::AudioProcessorEditor* createEditor() override;
+    AudioProcessorEditor* createEditor() override;
     bool hasEditor() const override;
 
     //==============================================================================
-    const juce::String getName() const override;
+    const String getName() const override;
 
     bool acceptsMidi() const override;
     bool producesMidi() const override;
@@ -46,14 +68,33 @@ public:
     int getNumPrograms() override;
     int getCurrentProgram() override;
     void setCurrentProgram (int index) override;
-    const juce::String getProgramName (int index) override;
-    void changeProgramName (int index, const juce::String& newName) override;
+    const String getProgramName (int index) override;
+    void changeProgramName (int index, const String& newName) override;
 
     //==============================================================================
-    void getStateInformation (juce::MemoryBlock& destData) override;
+    void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
+    AudioProcessorValueTreeState apvts;
+
 private:
-    //==============================================================================
+    AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
+    
+    AudioParameterFloat* thresholdParam;
+    AudioParameterChoice* ratioParam;
+    AudioParameterFloat* attackParam;
+    AudioParameterFloat* releaseParam;
+
+    std::atomic<bool> parametersChanged{ false };
+
+    void valueTreePropertyChanged(ValueTree&, const Identifier&) override {
+        parametersChanged.store(true);
+    }
+
+    void updateDSP();
+    DSPParameters<float> compressorParameters;
+
+    MultibandCompressor compressor;
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MultibandCompressorAudioProcessor)
 };

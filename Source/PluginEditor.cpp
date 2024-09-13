@@ -23,14 +23,14 @@ MultibandCompressorAudioProcessorEditor::~MultibandCompressorAudioProcessorEdito
 }
 
 //==============================================================================
-void MultibandCompressorAudioProcessorEditor::paint (juce::Graphics& g)
+void MultibandCompressorAudioProcessorEditor::paint (Graphics& g)
 {
     // (Our component is opaque, so we must completely fill the background with a solid colour)
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
+    g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
 
-    g.setColour (juce::Colours::white);
-    g.setFont (juce::FontOptions (15.0f));
-    g.drawFittedText ("Hello World!", getLocalBounds(), juce::Justification::centred, 1);
+    g.setColour (Colours::white);
+    g.setFont (FontOptions (15.0f));
+    g.drawFittedText ("Hello World!", getLocalBounds(), Justification::centred, 1);
 }
 
 void MultibandCompressorAudioProcessorEditor::resized()

@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="fnRsOH" name="MultibandCompressor" projectType="audioplug"
-              useAppConfig="0" addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1">
+              useAppConfig="0" addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1"
+              companyName="Glafo's" pluginManufacturerCode="GLAF" pluginCode="MBCP">
   <MAINGROUP id="rq1iy9" name="MultibandCompressor">
     <GROUP id="{04A80178-60E4-10E3-475F-2B6A769DFA3B}" name="Source">
       <FILE id="J0G8l7" name="PresetManager.h" compile="0" resource="0" file="Source/PresetManager.h"/>
       <FILE id="vxOihy" name="LookAndFeel.h" compile="0" resource="0" file="Source/LookAndFeel.h"/>
       <FILE id="PJNGW2" name="GUIComponents.h" compile="0" resource="0" file="Source/GUIComponents.h"/>
       <FILE id="GjSv0Q" name="Filters.h" compile="0" resource="0" file="Source/Filters.h"/>
-      <FILE id="eJ1pRl" name="SourceCode.hUtils.h" compile="0" resource="0"
-            file="Source/SourceCode.hUtils.h"/>
+      <FILE id="eJ1pRl" name="Utils.h" compile="0" resource="0" file="Source/Utils.h"/>
       <FILE id="Np0I1B" name="DSPParameters.h" compile="0" resource="0" file="Source/DSPParameters.h"/>
       <FILE id="xB8sjJ" name="Multiband.h" compile="0" resource="0" file="Source/Multiband.h"/>
       <FILE id="tMhXDq" name="PluginProcessor.cpp" compile="1" resource="0"
@@ -31,6 +31,7 @@
     <MODULE id="juce_audio_utils" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_core" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_data_structures" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_dsp" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_events" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_graphics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
@@ -40,8 +41,10 @@
   <EXPORTFORMATS>
     <VS2022 targetFolder="Builds/VisualStudio2022">
       <CONFIGURATIONS>
-        <CONFIGURATION isDebug="1" name="Debug" targetName="MultibandCompressor"/>
-        <CONFIGURATION isDebug="0" name="Release" targetName="MultibandCompressor"/>
+        <CONFIGURATION isDebug="1" name="Debug" targetName="MultibandCompressor" enablePluginBinaryCopyStep="1"
+                       vst3BinaryLocation="C:\Users\dglaf\Documents\VSTPlugins"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="MultibandCompressor" enablePluginBinaryCopyStep="1"
+                       vst3BinaryLocation="C:\Users\dglaf\Documents\VSTPlugins"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_audio_basics" path="../../../Libs/JUCE/modules"/>
@@ -56,6 +59,7 @@
         <MODULEPATH id="juce_graphics" path="../../../Libs/JUCE/modules"/>
         <MODULEPATH id="juce_gui_basics" path="../../../Libs/JUCE/modules"/>
         <MODULEPATH id="juce_gui_extra" path="../../../Libs/JUCE/modules"/>
+        <MODULEPATH id="juce_dsp" path="../../../Libs/JUCE/modules"/>
       </MODULEPATHS>
     </VS2022>
   </EXPORTFORMATS>

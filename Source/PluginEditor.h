@@ -14,14 +14,14 @@
 //==============================================================================
 /**
 */
-class MultibandCompressorAudioProcessorEditor  : public juce::AudioProcessorEditor
+class MultibandCompressorAudioProcessorEditor  : public AudioProcessorEditor
 {
 public:
     MultibandCompressorAudioProcessorEditor (MultibandCompressorAudioProcessor&);
     ~MultibandCompressorAudioProcessorEditor() override;
 
     //==============================================================================
-    void paint (juce::Graphics&) override;
+    void paint (Graphics&) override;
     void resized() override;
 
 private:
