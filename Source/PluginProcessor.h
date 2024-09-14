@@ -30,10 +30,14 @@ enum ParameterNames
     RATIO_LOW, RATIO_MID, RATIO_HIGH,
     ATTACK_LOW, ATTACK_MID, ATTACK_HIGH,
     RELEASE_LOW, RELEASE_MID, RELEASE_HIGH,
-    BYPASS_LOW, BYPASS_MID, BYPASS_HIGH,
+    INPUT_LOW, INPUT_MID, INPUT_HIGH,
+    OUTPUT_LOW, OUTPUT_MID, OUTPUT_HIGH,
+    MUTE_LOW, MUTE_MID, MUTE_HIGH,
     LOW_MID_CUT, MID_HIGH_CUT,
+    INPUT_ALL, OUTPUT_ALL,
+    BYPASS,
     PARAMETER_COUNT
-};
+};  
 
 static std::array<std::unique_ptr<IAPVTSParameter>, ParameterNames::PARAMETER_COUNT> apvtsParameters{
     std::make_unique<APVTSParameterFloat> ("thresholdLow",  "Threshold Low",  0.0f),
@@ -48,11 +52,20 @@ static std::array<std::unique_ptr<IAPVTSParameter>, ParameterNames::PARAMETER_CO
     std::make_unique<APVTSParameterFloat> ("releaseLow",    "Release Low",    250.0f),
     std::make_unique<APVTSParameterFloat> ("releaseMid",    "Release Mid",    250.0f),
     std::make_unique<APVTSParameterFloat> ("releaseHigh",   "Release High",   250.0f),
-    std::make_unique<APVTSParameterBool>  ("bypassLow",     "Bypass Low",     0.0f),
-    std::make_unique<APVTSParameterBool>  ("bypassMid",     "Bypass Mid",     0.0f),
-    std::make_unique<APVTSParameterBool>  ("bypassHigh",    "Bypass High",    0.0f),
+    std::make_unique<APVTSParameterFloat> ("inputLow",      "Input Low",      0.0f),
+    std::make_unique<APVTSParameterFloat> ("inputMid",      "Input Mid",      0.0f),
+    std::make_unique<APVTSParameterFloat> ("inputHigh",     "Input High",     0.0f),
+    std::make_unique<APVTSParameterFloat> ("outputLow",     "Output Low",     0.0f),
+    std::make_unique<APVTSParameterFloat> ("outputMid",     "Output Mid",     0.0f),
+    std::make_unique<APVTSParameterFloat> ("outputHigh",    "Output High",    0.0f),
+    std::make_unique<APVTSParameterBool>  ("muteLow",       "Mute Low",       0.0f),
+    std::make_unique<APVTSParameterBool>  ("muteMid",       "Mute Mid",       0.0f),
+    std::make_unique<APVTSParameterBool>  ("muteHigh",      "Mute High",      0.0f),
     std::make_unique<APVTSParameterFloat> ("lowMidCut",     "Low/Mid Cut",    700.0f),
-    std::make_unique<APVTSParameterFloat> ("midHighCut",    "Mid/High Cut",    5000.0f),
+    std::make_unique<APVTSParameterFloat> ("midHighCut",    "Mid/High Cut",   5000.0f),
+    std::make_unique<APVTSParameterFloat> ("inputAll",      "Input",          0.0f),
+    std::make_unique<APVTSParameterFloat> ("outputAll",     "Output",         0.0f),
+    std::make_unique<APVTSParameterBool>  ("bypass",        "Bypass",         0.0f)
 };
 
 class MultibandCompressorAudioProcessor  : 

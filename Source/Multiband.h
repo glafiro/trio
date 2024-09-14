@@ -29,6 +29,9 @@ class Compressor
 
 	float gainReduction{ 1.0f };
 
+	float inputGain { 1.0f };
+	float outputGain{ 1.0f };
+
 	friend class MultibandCompressor;
 
 public:
@@ -39,14 +42,17 @@ public:
 		nChannels = ch;
 	}
 
-	void update(float _threshold, float _ratio, float _attack, float _release) {
+	void update(float _threshold, float _ratio, float _attack, float _release, float _in, float _out) {
 		threshold = _threshold;
 		ratio = _ratio;
 		attack = msToCoefficient(sampleRate, _attack);
 		release = msToCoefficient(sampleRate, _release);
+		inputGain = dbToLinear(_in);
+		outputGain = dbToLinear(_out);
 	}
 
 	float processSample(float sample) {
+		sample *= inputGain;
 		auto sampleInDb = linearToDb(sample);
 				
 		float target{ 1.0f };
@@ -63,7 +69,7 @@ public:
 			gainReduction = release * gainReduction + (1.0f - release) * target;
 		}
 
-		return sample * gainReduction;
+		return sample * gainReduction * outputGain;
     }
 };
 
@@ -82,9 +88,15 @@ class MultibandCompressor
 	float blockSize { 0.0f };
 	int   nChannels { 1 };
 
-	bool bypassLow{ false };
-	bool bypassMid{ false };
-	bool bypassHigh{ false };
+	bool muteLow{ false };
+	bool muteMid{ false };
+	bool muteHigh{ false };
+	bool bypass{ false };
+
+	float inputGain { 1.0f };
+	float outputGain{ 1.0f };
+
+	float inputLow{ 1.0f };
 
 public:
 
@@ -93,14 +105,25 @@ public:
 		blockSize = params["blockSize"];
 		nChannels = static_cast<int>(params["nChannels"]);
 		
-		bypassLow = static_cast<bool>(params["bypassLow"]);
+		muteLow  = static_cast<bool>(params["muteLow"]);
+		muteMid  = static_cast<bool>(params["muteMid"]);
+		muteHigh = static_cast<bool>(params["muteHigh"]);
+		bypass   = static_cast<bool>(params["bypass"]);
 
 		lowBand.prepare(sampleRate, blockSize, nChannels);
-		lowBand.update(params["thresholdLow"], params["ratioLow"], params["attackLow"], params["releaseLow"]);
+		lowBand.update(params["thresholdLow"], params["ratioLow"], 
+					   params["attackLow"], params["releaseLow"],
+					   params["inputLow"], params["outputLow"]);
+		
 		midBand.prepare(sampleRate, blockSize, nChannels);
-		midBand.update(params["thresholdMid"], params["ratioMid"], params["attackMid"], params["releaseMid"]);
+		midBand.update(params["thresholdMid"], params["ratioMid"], 
+					   params["attackMid"], params["releaseMid"], 
+					   params["inputMid"], params["outputMid"]);
+		
 		highBand.prepare(sampleRate, blockSize, nChannels);
-		highBand.update(params["thresholdHigh"], params["ratioHigh"], params["attackHigh"], params["releaseHigh"]);
+		highBand.update(params["thresholdHigh"], params["ratioHigh"], 
+						params["attackHigh"], params["releaseHigh"],
+					    params["inputHigh"], params["outputHigh"]);
 
 		lowMidFilter.prepare(sampleRate, blockSize, nChannels);
 		lowMidCut = params["lowMidCut"];
@@ -110,42 +133,61 @@ public:
 		midHighCut = params["midHighCut"];
 		midHighFilter.setFrequency(midHighCut);
 
+		inputGain = dbToLinear(params["inputAll"]);
+		outputGain = dbToLinear(params["outputGainAll"]);
+
+		inputLow = dbToLinear(params["inputLow"]);
+		DBG(inputLow);
 	}
 
 	void update(DSPParameters<float>& params) {
-		bypassLow  = static_cast<bool>(params["bypassLow"]);
-		bypassMid  = static_cast<bool>(params["bypassMid"]);
-		bypassHigh = static_cast<bool>(params["bypassHigh"]);
+		muteLow = static_cast<bool>(params["muteLow"]);
+		muteMid = static_cast<bool>(params["muteMid"]);
+		muteHigh = static_cast<bool>(params["muteHigh"]);
+		bypass = static_cast<bool>(params["bypass"]);
 
 		lowMidCut = params["lowMidCut"];
 		lowMidFilter.setFrequency(lowMidCut);
 
 		midHighCut = params["midHighCut"];
 		midHighFilter.setFrequency(midHighCut);
-		
-		lowBand.update(params["thresholdLow"], params["ratioLow"], params["attackLow"], params["releaseLow"]);
-		midBand.update(params["thresholdMid"], params["ratioMid"], params["attackMid"], params["releaseMid"]);
-		highBand.update(params["thresholdHigh"], params["ratioHigh"], params["attackHigh"], params["releaseHigh"]);
-	}
 
+		lowBand.update(params["thresholdLow"], params["ratioLow"],
+			params["attackLow"], params["releaseLow"],
+			params["inputLow"], params["outputLow"]);
+
+		midBand.update(params["thresholdMid"], params["ratioMid"],
+			params["attackMid"], params["releaseMid"],
+			params["inputMid"], params["outputMid"]);
+
+		highBand.update(params["thresholdHigh"], params["ratioHigh"],
+			params["attackHigh"], params["releaseHigh"],
+			params["inputHigh"], params["outputHigh"]);
+
+
+		inputGain = dbToLinear(params["inputAll"]);
+		outputGain = dbToLinear(params["outputAll"]);
+	
+	}
 
 	void processBlock(float** inputBuffer, int numChannels, int numSamples) {
 		for (int ch = 0; ch < numChannels; ++ch) {
 			for (int s = 0; s < numSamples; ++s) {
-
-				auto sample = inputBuffer[ch][s]; 
+				if (!bypass) {
+					auto sample = inputGain * inputBuffer[ch][s]; 
 				
-				float lowBandFiltered, midBandFiltered, highBandFiltered;
-				float lowBandCompressed, midBandCompressed, highBandCompressed;
+					float lowBandFiltered, midBandFiltered, highBandFiltered;
+					float lowBandCompressed, midBandCompressed, highBandCompressed;
 				
-				lowMidFilter.processSample(ch, sample, lowBandFiltered, midBandFiltered);
-				midHighFilter.processSample(ch, midBandFiltered, midBandFiltered, highBandFiltered);
+					lowMidFilter.processSample(ch, sample, lowBandFiltered, midBandFiltered);
+					midHighFilter.processSample(ch, midBandFiltered, midBandFiltered, highBandFiltered);
 				
-				lowBandCompressed  = bypassLow  ? 0.0f : lowBand.processSample(lowBandFiltered);
-				midBandCompressed  = bypassMid  ? 0.0f : midBand.processSample(midBandFiltered);
-				highBandCompressed = bypassHigh ? 0.0f : highBand.processSample(highBandFiltered);
+					lowBandCompressed  = muteLow  ? 0.0f : lowBand.processSample(lowBandFiltered);
+					midBandCompressed  = muteMid  ? 0.0f : midBand.processSample(midBandFiltered);
+					highBandCompressed = muteHigh ? 0.0f : highBand.processSample(highBandFiltered);
 				
-				inputBuffer[ch][s] = lowBandCompressed + midBandCompressed + highBandCompressed;
+					inputBuffer[ch][s] = (lowBandCompressed + midBandCompressed + highBandCompressed) * outputGain;
+				}
 			}
 		}
 	}
