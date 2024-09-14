@@ -16,7 +16,7 @@ MultibandCompressorAudioProcessor::MultibandCompressorAudioProcessor()
 #endif
 {
     apvts.state.addListener(this);
-    for (auto& param : parameters) {
+    for (auto& param : apvtsParameters) {
         param->castParameter(apvts);
     }
 }
@@ -95,7 +95,7 @@ void MultibandCompressorAudioProcessor::prepareToPlay (double sampleRate, int sa
     compressorParameters.set("blockSize", samplesPerBlock);
     compressorParameters.set("nChannels", nChannels);
 
-    for (auto& param : parameters) {
+    for (auto& param : apvtsParameters) {
         compressorParameters.set(param->id.getParamID().toStdString(), param->getDefault());
     }
 
@@ -137,7 +137,7 @@ bool MultibandCompressorAudioProcessor::isBusesLayoutSupported (const BusesLayou
 void MultibandCompressorAudioProcessor::updateDSP()
 {
 
-    for (auto& param : parameters) {
+    for (auto& param : apvtsParameters) {
         compressorParameters.set(param->id.getParamID().toStdString(), param->get());
     }
 
@@ -197,126 +197,125 @@ juce::AudioProcessorValueTreeState::ParameterLayout MultibandCompressorAudioProc
 {
     juce::AudioProcessorValueTreeState::ParameterLayout layout;
 
-
     layout.add(std::make_unique <juce::AudioParameterFloat>(
-        parameters[ParameterNames::THRESHOLD_LOW]->id,
-        parameters[ParameterNames::THRESHOLD_LOW]->displayValue,
+        apvtsParameters[ParameterNames::THRESHOLD_LOW]->id,
+        apvtsParameters[ParameterNames::THRESHOLD_LOW]->displayValue,
         juce::NormalisableRange<float>{ -60.0f, 12.0f, 1.0f },
-        parameters[ParameterNames::THRESHOLD_LOW]->getDefault()
+        apvtsParameters[ParameterNames::THRESHOLD_LOW]->getDefault()
     ));
 
     layout.add(std::make_unique <juce::AudioParameterFloat>(
-        parameters[ParameterNames::THRESHOLD_MID]->id,
-        parameters[ParameterNames::THRESHOLD_MID]->displayValue,
+        apvtsParameters[ParameterNames::THRESHOLD_MID]->id,
+        apvtsParameters[ParameterNames::THRESHOLD_MID]->displayValue,
         juce::NormalisableRange<float>{ -60.0f, 12.0f, 1.0f},
-        parameters[ParameterNames::THRESHOLD_MID]->getDefault()
+        apvtsParameters[ParameterNames::THRESHOLD_MID]->getDefault()
     ));
 
     layout.add(std::make_unique <juce::AudioParameterFloat>(
-        parameters[ParameterNames::THRESHOLD_HIGH]->id,
-        parameters[ParameterNames::THRESHOLD_HIGH]->displayValue,
+        apvtsParameters[ParameterNames::THRESHOLD_HIGH]->id,
+        apvtsParameters[ParameterNames::THRESHOLD_HIGH]->displayValue,
         juce::NormalisableRange<float>{ -60.0f, 12.0f, 1.0f},
-        parameters[ParameterNames::THRESHOLD_HIGH]->getDefault()
+        apvtsParameters[ParameterNames::THRESHOLD_HIGH]->getDefault()
     ));
 
     auto ratios = StringArray{ "1", "1.5", "2", "3", "4", "5", "6", "7", "8", "10", "15", "20", "50", "100" };
 
     layout.add(std::make_unique <juce::AudioParameterChoice>(
-        parameters[ParameterNames::RATIO_LOW]->id,
-        parameters[ParameterNames::THRESHOLD_LOW]->displayValue,
+        apvtsParameters[ParameterNames::RATIO_LOW]->id,
+        apvtsParameters[ParameterNames::RATIO_LOW]->displayValue,
         ratios,
         3
     ));
     
     layout.add(std::make_unique <juce::AudioParameterChoice>(
-        parameters[ParameterNames::RATIO_MID]->id,
-        parameters[ParameterNames::THRESHOLD_MID]->displayValue,
+        apvtsParameters[ParameterNames::RATIO_MID]->id,
+        apvtsParameters[ParameterNames::RATIO_MID]->displayValue,
         ratios,
         3
     ));
     
     layout.add(std::make_unique <juce::AudioParameterChoice>(
-        parameters[ParameterNames::RATIO_HIGH]->id,
-        parameters[ParameterNames::THRESHOLD_HIGH]->displayValue,
+        apvtsParameters[ParameterNames::RATIO_HIGH]->id,
+        apvtsParameters[ParameterNames::RATIO_HIGH]->displayValue,
         ratios,
         3
     ));
 
     layout.add(std::make_unique <juce::AudioParameterFloat>(
-        parameters[ParameterNames::ATTACK_LOW]->id,
-        parameters[ParameterNames::ATTACK_LOW]->displayValue,
+        apvtsParameters[ParameterNames::ATTACK_LOW]->id,
+        apvtsParameters[ParameterNames::ATTACK_LOW]->displayValue,
         juce::NormalisableRange<float>{ 5.0f, 5000.0f, 1.0f },
-        parameters[ParameterNames::ATTACK_LOW]->getDefault()
+        apvtsParameters[ParameterNames::ATTACK_LOW]->getDefault()
     ));
 
     layout.add(std::make_unique <juce::AudioParameterFloat>(
-        parameters[ParameterNames::ATTACK_MID]->id,
-        parameters[ParameterNames::ATTACK_MID]->displayValue,
+        apvtsParameters[ParameterNames::ATTACK_MID]->id,
+        apvtsParameters[ParameterNames::ATTACK_MID]->displayValue,
         juce::NormalisableRange<float>{ 5.0f, 5000.0f, 1.0f },
-        parameters[ParameterNames::ATTACK_MID]->getDefault()
-    ));
-
-
-    layout.add(std::make_unique <juce::AudioParameterFloat>(
-        parameters[ParameterNames::ATTACK_HIGH]->id,
-        parameters[ParameterNames::ATTACK_HIGH]->displayValue,
-        juce::NormalisableRange<float>{ 5.0f, 5000.0f, 1.0f },
-        parameters[ParameterNames::ATTACK_HIGH]->getDefault()
+        apvtsParameters[ParameterNames::ATTACK_MID]->getDefault()
     ));
 
 
     layout.add(std::make_unique <juce::AudioParameterFloat>(
-        parameters[ParameterNames::RELEASE_LOW]->id,
-        parameters[ParameterNames::RELEASE_LOW]->displayValue,
+        apvtsParameters[ParameterNames::ATTACK_HIGH]->id,
+        apvtsParameters[ParameterNames::ATTACK_HIGH]->displayValue,
         juce::NormalisableRange<float>{ 5.0f, 5000.0f, 1.0f },
-        parameters[ParameterNames::RELEASE_LOW]->getDefault()
-    ));
-
-    layout.add(std::make_unique <juce::AudioParameterFloat>(
-        parameters[ParameterNames::RELEASE_MID]->id,
-        parameters[ParameterNames::RELEASE_MID]->displayValue,
-        juce::NormalisableRange<float>{ 5.0f, 5000.0f, 1.0f },
-        parameters[ParameterNames::RELEASE_MID]->getDefault()
+        apvtsParameters[ParameterNames::ATTACK_HIGH]->getDefault()
     ));
 
 
     layout.add(std::make_unique <juce::AudioParameterFloat>(
-        parameters[ParameterNames::RELEASE_HIGH]->id,
-        parameters[ParameterNames::RELEASE_HIGH]->displayValue,
+        apvtsParameters[ParameterNames::RELEASE_LOW]->id,
+        apvtsParameters[ParameterNames::RELEASE_LOW]->displayValue,
         juce::NormalisableRange<float>{ 5.0f, 5000.0f, 1.0f },
-        parameters[ParameterNames::RELEASE_HIGH]->getDefault()
+        apvtsParameters[ParameterNames::RELEASE_LOW]->getDefault()
+    ));
+
+    layout.add(std::make_unique <juce::AudioParameterFloat>(
+        apvtsParameters[ParameterNames::RELEASE_MID]->id,
+        apvtsParameters[ParameterNames::RELEASE_MID]->displayValue,
+        juce::NormalisableRange<float>{ 5.0f, 5000.0f, 1.0f },
+        apvtsParameters[ParameterNames::RELEASE_MID]->getDefault()
+    ));
+
+
+    layout.add(std::make_unique <juce::AudioParameterFloat>(
+        apvtsParameters[ParameterNames::RELEASE_HIGH]->id,
+        apvtsParameters[ParameterNames::RELEASE_HIGH]->displayValue,
+        juce::NormalisableRange<float>{ 5.0f, 5000.0f, 1.0f },
+        apvtsParameters[ParameterNames::RELEASE_HIGH]->getDefault()
     ));
 
     layout.add(std::make_unique <juce::AudioParameterBool>(
-        parameters[ParameterNames::BYPASS_LOW]->id,
-        parameters[ParameterNames::BYPASS_LOW]->displayValue,
-        parameters[ParameterNames::BYPASS_LOW]->getDefault()
+        apvtsParameters[ParameterNames::BYPASS_LOW]->id,
+        apvtsParameters[ParameterNames::BYPASS_LOW]->displayValue,
+        apvtsParameters[ParameterNames::BYPASS_LOW]->getDefault()
     ));
     
     layout.add(std::make_unique <juce::AudioParameterBool>(
-        parameters[ParameterNames::BYPASS_MID]->id,
-        parameters[ParameterNames::BYPASS_MID]->displayValue,
-        parameters[ParameterNames::BYPASS_MID]->getDefault()
+        apvtsParameters[ParameterNames::BYPASS_MID]->id,
+        apvtsParameters[ParameterNames::BYPASS_MID]->displayValue,
+        apvtsParameters[ParameterNames::BYPASS_MID]->getDefault()
     ));
     
     layout.add(std::make_unique <juce::AudioParameterBool>(
-        parameters[ParameterNames::BYPASS_HIGH]->id,
-        parameters[ParameterNames::BYPASS_HIGH]->displayValue,
-        parameters[ParameterNames::BYPASS_HIGH]->getDefault()
+        apvtsParameters[ParameterNames::BYPASS_HIGH]->id,
+        apvtsParameters[ParameterNames::BYPASS_HIGH]->displayValue,
+        apvtsParameters[ParameterNames::BYPASS_HIGH]->getDefault()
     ));
 
     layout.add(std::make_unique <juce::AudioParameterFloat>(
-        parameters[ParameterNames::LOW_MID_CUT]->id,
-        parameters[ParameterNames::LOW_MID_CUT]->displayValue,
+        apvtsParameters[ParameterNames::LOW_MID_CUT]->id,
+        apvtsParameters[ParameterNames::LOW_MID_CUT]->displayValue,
         juce::NormalisableRange<float>{ -60.0f, 12.0f, 1.0f },
-        parameters[ParameterNames::LOW_MID_CUT]->getDefault()
+        apvtsParameters[ParameterNames::LOW_MID_CUT]->getDefault()
     ));
     
     layout.add(std::make_unique <juce::AudioParameterFloat>(
-        parameters[ParameterNames::MID_HIGH_CUT]->id,
-        parameters[ParameterNames::MID_HIGH_CUT]->displayValue,
+        apvtsParameters[ParameterNames::MID_HIGH_CUT]->id,
+        apvtsParameters[ParameterNames::MID_HIGH_CUT]->displayValue,
         juce::NormalisableRange<float>{ -60.0f, 12.0f, 1.0f },
-        parameters[ParameterNames::MID_HIGH_CUT]->getDefault()
+        apvtsParameters[ParameterNames::MID_HIGH_CUT]->getDefault()
     ));
 
 

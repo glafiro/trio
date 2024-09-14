@@ -22,28 +22,7 @@ using std::unordered_map;
 #include "DSPParameters.h"
 #include "Multiband.h"
 #include "Utils.h"
-#include "Parameters.h"
-
-static std::array<std::unique_ptr<IAPVTSParameter>, 17> parameters{
-    std::make_unique<APVTSParameterFloat>("thresholdLow", "Threshold Low", 0.0f),
-    std::make_unique<APVTSParameterFloat>("thresholdMid", "Threshold Mid", 0.0f),
-    std::make_unique<APVTSParameterFloat>("thresholdHigh", "Threshold High", 0.0f),
-    std::make_unique<APVTSParameterChoice>("ratioLow", "Ratio Low", 3.0f),
-    std::make_unique<APVTSParameterChoice>("ratioMid", "Ratio Mid", 3.0f),
-    std::make_unique<APVTSParameterChoice>("ratioHigh", "Ratio High", 3.0f),
-    std::make_unique<APVTSParameterFloat>("attackLow", "Attack Low", 50.0f),
-    std::make_unique<APVTSParameterFloat>("attackMid", "Attack Mid", 50.0f),
-    std::make_unique<APVTSParameterFloat>("attackHigh", "Attack High", 50.0f),
-    std::make_unique<APVTSParameterFloat>("releaseLow", "Release Low", 250.0f),
-    std::make_unique<APVTSParameterFloat>("releaseMid", "Release Mid", 250.0f),
-    std::make_unique<APVTSParameterFloat>("releaseHigh", "Release High", 250.0f),
-    std::make_unique<APVTSParameterBool>("bypassLow", "Bypass Low", 0.0f),
-    std::make_unique<APVTSParameterBool>("bypassMid", "Bypass Mid", 0.0f),
-    std::make_unique<APVTSParameterBool>("bypassHigh", "Bypass High", 0.0f),
-    std::make_unique<APVTSParameterFloat>("lowMidCut", "Low/Mid Cut", 0.0f),
-    std::make_unique<APVTSParameterFloat>("midHightCut", "Mid/High Cut", 0.0f),
-};
-
+#include "APVTSParameter.h"
 
 enum ParameterNames
 {
@@ -52,7 +31,28 @@ enum ParameterNames
     ATTACK_LOW, ATTACK_MID, ATTACK_HIGH,
     RELEASE_LOW, RELEASE_MID, RELEASE_HIGH,
     BYPASS_LOW, BYPASS_MID, BYPASS_HIGH,
-    LOW_MID_CUT, MID_HIGH_CUT
+    LOW_MID_CUT, MID_HIGH_CUT,
+    PARAMETER_COUNT
+};
+
+static std::array<std::unique_ptr<IAPVTSParameter>, ParameterNames::PARAMETER_COUNT> apvtsParameters{
+    std::make_unique<APVTSParameterFloat> ("thresholdLow",  "Threshold Low",  0.0f),
+    std::make_unique<APVTSParameterFloat> ("thresholdMid",  "Threshold Mid",  0.0f),
+    std::make_unique<APVTSParameterFloat> ("thresholdHigh", "Threshold High", 0.0f),
+    std::make_unique<APVTSParameterChoice>("ratioLow",      "Ratio Low",      3.0f),
+    std::make_unique<APVTSParameterChoice>("ratioMid",      "Ratio Mid",      3.0f),
+    std::make_unique<APVTSParameterChoice>("ratioHigh",     "Ratio High",     3.0f),
+    std::make_unique<APVTSParameterFloat> ("attackLow",     "Attack Low",     50.0f),
+    std::make_unique<APVTSParameterFloat> ("attackMid",     "Attack Mid",     50.0f),
+    std::make_unique<APVTSParameterFloat> ("attackHigh",    "Attack High",    50.0f),
+    std::make_unique<APVTSParameterFloat> ("releaseLow",    "Release Low",    250.0f),
+    std::make_unique<APVTSParameterFloat> ("releaseMid",    "Release Mid",    250.0f),
+    std::make_unique<APVTSParameterFloat> ("releaseHigh",   "Release High",   250.0f),
+    std::make_unique<APVTSParameterBool>  ("bypassLow",     "Bypass Low",     0.0f),
+    std::make_unique<APVTSParameterBool>  ("bypassMid",     "Bypass Mid",     0.0f),
+    std::make_unique<APVTSParameterBool>  ("bypassHigh",    "Bypass High",    0.0f),
+    std::make_unique<APVTSParameterFloat> ("lowMidCut",     "Low/Mid Cut",    0.0f),
+    std::make_unique<APVTSParameterFloat> ("midHightCut",   "Mid/High Cut",   0.0f),
 };
 
 class MultibandCompressorAudioProcessor  : 
@@ -112,7 +112,6 @@ private:
     DSPParameters<float> compressorParameters;
 
     Compressor compressor;
-
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MultibandCompressorAudioProcessor)
 };

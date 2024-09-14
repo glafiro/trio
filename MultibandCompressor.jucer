@@ -5,7 +5,8 @@
               companyName="Glafo's" pluginManufacturerCode="GLAF" pluginCode="MBCP">
   <MAINGROUP id="rq1iy9" name="MultibandCompressor">
     <GROUP id="{04A80178-60E4-10E3-475F-2B6A769DFA3B}" name="Source">
-      <FILE id="xQICp8" name="Parameters.h" compile="0" resource="0" file="Source/Parameters.h"/>
+      <FILE id="xQICp8" name="APVTSParameter.h" compile="0" resource="0"
+            file="Source/APVTSParameter.h"/>
       <FILE id="J0G8l7" name="PresetManager.h" compile="0" resource="0" file="Source/PresetManager.h"/>
       <FILE id="vxOihy" name="LookAndFeel.h" compile="0" resource="0" file="Source/LookAndFeel.h"/>
       <FILE id="PJNGW2" name="GUIComponents.h" compile="0" resource="0" file="Source/GUIComponents.h"/>

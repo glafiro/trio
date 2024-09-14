@@ -30,24 +30,24 @@ class Compressor
 
 public:
 
-    void prepare(DSPParameters<float> params) {
+    void prepare(DSPParameters<float>& params) {
+		readParameters(params);
+	}
+
+	void update(DSPParameters<float>& params) {
+		readParameters(params);
+	}
+
+	void readParameters(DSPParameters<float>& params) {
 		sampleRate = params["sampleRate"];
 		blockSize = params["blockSize"];
 		nChannels = static_cast<int>(params["nChannels"]);
 
 		ratio = params["ratioLow"];
 		threshold = params["thresholdLow"];
-		attack  = msToCoefficient(params["attackLow"]);
-		release = msToCoefficient(params["releaseLow"]);
-		bypass  = static_cast<bool>(params["bypassLow"]);
-	}
-
-	void update(DSPParameters<float> params) {
-		ratio = params["ratioLow"];
-		threshold = params["thresholdLow"];
 		attack = msToCoefficient(params["attackLow"]);
 		release = msToCoefficient(params["releaseLow"]);
-		bypass  = static_cast<bool>(params["bypassLow"]);
+		bypass = static_cast<bool>(params["bypassLow"]);
 	}
 
 	void processBlock(float* const* inputBuffer, int numChannels, int numSamples) {
