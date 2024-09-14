@@ -159,8 +159,12 @@ void MultibandCompressorAudioProcessor::processBlock (AudioBuffer<float>& buffer
         updateDSP();
     }
 
+    float* outputBuffers[2] = { nullptr, nullptr };
+    outputBuffers[0] = buffer.getWritePointer(0);
+    if (totalNumOutputChannels > 1) outputBuffers[1] = buffer.getWritePointer(1);
+
     compressor.processBlock(
-        buffer.getArrayOfWritePointers(),
+        outputBuffers,
         buffer.getNumChannels(),
         buffer.getNumSamples()
     );
@@ -307,14 +311,14 @@ juce::AudioProcessorValueTreeState::ParameterLayout MultibandCompressorAudioProc
     layout.add(std::make_unique <juce::AudioParameterFloat>(
         apvtsParameters[ParameterNames::LOW_MID_CUT]->id,
         apvtsParameters[ParameterNames::LOW_MID_CUT]->displayValue,
-        juce::NormalisableRange<float>{ -60.0f, 12.0f, 1.0f },
+        juce::NormalisableRange<float>{ 20.0f, 20000.0f, 1.0f, 0.3f },
         apvtsParameters[ParameterNames::LOW_MID_CUT]->getDefault()
     ));
     
     layout.add(std::make_unique <juce::AudioParameterFloat>(
         apvtsParameters[ParameterNames::MID_HIGH_CUT]->id,
         apvtsParameters[ParameterNames::MID_HIGH_CUT]->displayValue,
-        juce::NormalisableRange<float>{ -60.0f, 12.0f, 1.0f },
+        juce::NormalisableRange<float>{ 20.0f, 20000.0f, 1.0f, 0.3f },
         apvtsParameters[ParameterNames::MID_HIGH_CUT]->getDefault()
     ));
 

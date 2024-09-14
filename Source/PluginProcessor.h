@@ -51,8 +51,8 @@ static std::array<std::unique_ptr<IAPVTSParameter>, ParameterNames::PARAMETER_CO
     std::make_unique<APVTSParameterBool>  ("bypassLow",     "Bypass Low",     0.0f),
     std::make_unique<APVTSParameterBool>  ("bypassMid",     "Bypass Mid",     0.0f),
     std::make_unique<APVTSParameterBool>  ("bypassHigh",    "Bypass High",    0.0f),
-    std::make_unique<APVTSParameterFloat> ("lowMidCut",     "Low/Mid Cut",    0.0f),
-    std::make_unique<APVTSParameterFloat> ("midHightCut",   "Mid/High Cut",   0.0f),
+    std::make_unique<APVTSParameterFloat> ("lowMidCut",     "Low/Mid Cut",    700.0f),
+    std::make_unique<APVTSParameterFloat> ("midHighCut",    "Mid/High Cut",    5000.0f),
 };
 
 class MultibandCompressorAudioProcessor  : 
@@ -111,7 +111,7 @@ private:
     void updateDSP();
     DSPParameters<float> compressorParameters;
 
-    Compressor compressor;
+    MultibandCompressor compressor;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MultibandCompressorAudioProcessor)
 };
