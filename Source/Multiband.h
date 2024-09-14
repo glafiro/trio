@@ -11,8 +11,9 @@
 #pragma once
 
 #include "Utils.h"
+#include "DSPParameters.h"
 
-class MultibandCompressor
+class Compressor
 {
 	float sampleRate{ 44100.0f };
 	float blockSize{ 0.0f };
@@ -23,6 +24,8 @@ class MultibandCompressor
     float attack{ 0.0f };
     float release{ 0.0f };
 
+	bool bypass;
+
 	float gainReduction{ 1.0f };
 
 public:
@@ -32,27 +35,34 @@ public:
 		blockSize = params["blockSize"];
 		nChannels = static_cast<int>(params["nChannels"]);
 
-		ratio = params["ratio"];
-		threshold = params["threshold"];
-		attack  = msToCoefficient(params["attack"]);
-		release = msToCoefficient(params["release"]);
+		ratio = params["ratioLow"];
+		threshold = params["thresholdLow"];
+		attack  = msToCoefficient(params["attackLow"]);
+		release = msToCoefficient(params["releaseLow"]);
+		bypass  = static_cast<bool>(params["bypassLow"]);
 	}
 
 	void update(DSPParameters<float> params) {
-		ratio = params["ratio"];
-		threshold = params["threshold"];
-		attack = msToCoefficient(params["attack"]);
-		release = msToCoefficient(params["release"]);
+		ratio = params["ratioLow"];
+		threshold = params["thresholdLow"];
+		attack = msToCoefficient(params["attackLow"]);
+		release = msToCoefficient(params["releaseLow"]);
+		bypass  = static_cast<bool>(params["bypassLow"]);
 	}
 
 	void processBlock(float* const* inputBuffer, int numChannels, int numSamples) {
 		for (int ch = 0; ch < numChannels; ++ch) {
 			for (auto s = 0; s < numSamples; ++s) {
 				auto sample = inputBuffer[ch][s];
-				auto sampleInDb = linearToDb(sample);
 
+				if (bypass) {
+					inputBuffer[ch][s] = sample;
+					return;
+				}
 
 				// Compression
+				auto sampleInDb = linearToDb(sample);
+				
 				float target{ 1.0f };
 				if (sampleInDb > threshold) {
 					auto excess = sampleInDb - threshold;
@@ -71,7 +81,6 @@ public:
 
 			}
 		}
-
 	}
 
 private:
