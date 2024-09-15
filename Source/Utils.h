@@ -3,10 +3,8 @@
 #include <JuceHeader.h>
 #include <cmath>
 
-#define SILENCE 0.000001f
-
 float linearToDb(float input) {
-    return 20.0f * log10f(fabsf(input) + SILENCE);
+    return 20.0f * log10f(fabsf(input) + 0.000001f);
 }
 
 float dbToLinear(float input) {
@@ -48,45 +46,6 @@ T clamp(T val, T minVal, T maxVal) {
     val = fmax(val, minVal);
     return val;
 }
-
-
-class LogarithmicFader
-{
-    float currentGain, targetGain, multiplier;
-    float attackTime, releaseTime, fadeSize;
-    float sampleRate;
-    bool defaultOn;
-
-public:
-    LogarithmicFader(float atk = 300.0f, float rls = 300.0f, bool defaultOn = false) : attackTime(atk), releaseTime(rls), defaultOn(defaultOn), currentGain(SILENCE), targetGain(SILENCE), multiplier(1.0) {}
-
-    void prepare(float sr) {
-        sampleRate = sr;
-        fadeSize = defaultOn ? lengthToSamples(releaseTime, sampleRate) : lengthToSamples(attackTime, sampleRate);
-    }
-
-    void setTarget(int isOn) {
-        targetGain = isOn ? 1.0f : SILENCE;
-
-        if (targetGain < currentGain) fadeSize = lengthToSamples(releaseTime, sampleRate);
-        else fadeSize = lengthToSamples(attackTime, sampleRate);
-        multiplier = std::pow(targetGain / currentGain, 1.0f / fadeSize);
-    }
-
-    float getNextValue() {
-        if (std::abs(currentGain - targetGain) > 0.0001f) {
-            currentGain *= multiplier;
-            if ((multiplier > 1.0f && currentGain >= targetGain) || (multiplier < 1.0f && currentGain <= targetGain)) {
-                currentGain = targetGain;
-            }
-        }
-        return currentGain;
-    }
-
-    float read() {
-        return currentGain;
-    }
-};
 
 class SlewLimiter
 {
