@@ -1,1 +1,1 @@
-# multiband-compressor
+# trio
